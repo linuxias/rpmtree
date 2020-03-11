@@ -3,14 +3,34 @@
 import re
 import subprocess
 
+class Rpm(object):
+    def __init__(self, name):
+        self._name = name
+        self._version = None
+        self._release = None
+        self._arch = None
+        self._install_date = None
+        self._group = None
+        self._license = None
+        self._signature = None
+        self._src_rpm = None
+        self._build_date = None
+        self._build_host = None
+        self._relocations = None
+        self._vendor = None
+        self._url = None
+        self._vcs = None
+        self._summary = None
+        self.Description = None
+
 class RpmUtil(object):
     @staticmethod
     def get_all_list():
         cmd = 'rpm -qa'
         meta = subprocess.check_output(cmd, shell=True)
-        meta = meta.decode('utf-8')
         rpm_list = meta.split()
-        return ret
+        print(rpm_list)
+        return rpm_list
 
 def main():
     rpmlist = RpmUtil.get_all_list()
