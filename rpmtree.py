@@ -29,11 +29,16 @@ class RpmUtil(object):
         cmd = 'rpm -qa'
         meta = subprocess.check_output(cmd, shell=True)
         rpm_list = meta.split()
-        print(rpm_list)
         return rpm_list
 
+    @staticmethod
+    def get_info(name):
+        cmd = 'rpm -qi ' + name
+        data = subprocess.check_output(cmd, shell=True)
+        return data
+
 def main():
-    rpmlist = RpmUtil.get_all_list()
+    print(RpmUtil.get_info('data-provider-master'))
 
 if __name__ == '__main__':
     main()
