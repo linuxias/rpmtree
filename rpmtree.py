@@ -6,22 +6,11 @@ import subprocess
 class Rpm(object):
     def __init__(self, name):
         self._name = name
-        self._version = None
-        self._release = None
-        self._arch = None
-        self._install_date = None
-        self._group = None
-        self._license = None
-        self._signature = None
-        self._src_rpm = None
-        self._build_date = None
-        self._build_host = None
-        self._relocations = None
-        self._vendor = None
-        self._url = None
-        self._vcs = None
-        self._summary = None
-        self.Description = None
+        self._rpminfo = RpmUtil.get_info(self._name)
+
+    def __str__(self):
+        return self._rpminfo
+
 
 class RpmUtil(object):
     @staticmethod
@@ -38,7 +27,8 @@ class RpmUtil(object):
         return data
 
 def main():
-    print(RpmUtil.get_info('data-provider-master'))
+    rpm = Rpm('glibc')
+    print str(rpm)
 
 if __name__ == '__main__':
     main()
