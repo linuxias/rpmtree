@@ -11,6 +11,9 @@ class Rpm(object):
     def __str__(self):
         return self._rpminfo
 
+    @property
+    def name(self):
+        return self._name
 
 class RpmUtil(object):
     @staticmethod
@@ -26,9 +29,19 @@ class RpmUtil(object):
         data = subprocess.check_output(cmd, shell=True)
         return data
 
+    @staticmethod
+    def get_requires_list(rpm):
+        except_list = [ 'ld-linux', '/sbin/ldconfig', '/usr', '.so']
+        cmd = 'rpm -qR ' + rpm.name
+        data = subprocess.check_output(cmd, shell=True)
+        data = data.splitlines()
+        requires = [ r for r in data if not r in except_list ]
+        return requires
+
 def main():
     rpm = Rpm('glibc')
     print str(rpm)
+    print RpmUtil.get_requires_list(rpm)
 
 if __name__ == '__main__':
     main()
