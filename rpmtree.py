@@ -2,6 +2,7 @@
 
 import re
 import subprocess
+import curses
 
 class Rpm(object):
     def __init__(self, name):
@@ -37,6 +38,19 @@ class RpmUtil(object):
         data = data.splitlines()
         requires = [ r for r in data if not r in except_list ]
         return requires
+
+class nView(object):
+    def __init__(self):
+        curses.initscr()
+        curses.noecho()
+        curses.cbreak()
+        stdscr.keypad(True)
+
+    def __del__(self):
+        curses.nocbreak()
+        stdscr.keypad(False)
+        curses.echo()
+        curses.endwin()
 
 def main():
     rpm = Rpm('glibc')
