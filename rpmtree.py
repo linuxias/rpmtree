@@ -3,6 +3,8 @@
 import re
 import subprocess
 import curses
+from curses import panel
+import time
 
 class Rpm(object):
     def __init__(self, name):
@@ -39,23 +41,84 @@ class RpmUtil(object):
         requires = [ r for r in data if not r in except_list ]
         return requires
 
-class nView(object):
+class Menu(object):
+    def __init__(self, items, stdscr):
+        self._win = stdscr.subwin(0,0)
+        self._win.keypad(True)
+
+        self._panel = panel.new_panel(self._win)
+        self._panel.hide()
+        panel.update_panels()
+
+        self._pos = 0
+        self._items = items
+        self._items.append(('exit','exit'))
+
+    def display(self):
+        def navigate(n):
+            self._pos += n
+            if self._pos < 0:
+                self._pos = 0
+            elif self._pos >= len(self._items):
+                self._pos = len(self._items)-1
+
+        self._panel.top()
+        self._panel.show()
+        self._win.clear()
+
+        while True:
+            self._win.refresh()
+            curses.doupdate()
+            for index, item in enumerate(self._items):
+                if index == self._pos:
+                    mode = curses.A_REVERSE
+                else:
+                    mode = curses.A_NORMAL
+
+                msg = '%d. %s' % (index, item[0])
+                self._win.addstr(1 + index, 1, msg, mode)
+
+            key = self._win.getch()
+
+            if key in [curses.KEY_ENTER, ord('\n')]:
+                if self._pos == len(self._items) - 1:
+                    break
+                else:
+                    self._items[self._pos][1]()
+
+            elif key == curses.KEY_UP:
+                navigate(-1)
+
+            elif key == curses.KEY_DOWN:
+                navigate(1)
+
+        self._win.clear()
+        self._panel.hide()
+        panel.update_panels()
+        curses.doupdate()
+
+class ViewManager(object):
     def __init__(self):
-        curses.initscr()
+        self._stdscr = curses.initscr()
         curses.noecho()
         curses.cbreak()
-        stdscr.keypad(True)
+        curses.curs_set(0)
+        self._stdscr.keypad(True)
 
     def __del__(self):
         curses.nocbreak()
-        stdscr.keypad(False)
+        self._stdscr.keypad(False)
         curses.echo()
         curses.endwin()
 
-def main():
-    rpm = Rpm('glibc')
-    print str(rpm)
-    print RpmUtil.get_requires_list(rpm)
+    def show_menu(self):
+        menu_items = [
+                ]
+        menu = Menu(menu_items, self._stdscr)
+        menu.display()
 
 if __name__ == '__main__':
-    main()
+    view = ViewManager()
+    view.show_menu()
+
+    del view
