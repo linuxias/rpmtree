@@ -41,6 +41,14 @@ class RpmUtil(object):
         requires = [ r for r in data if not r in except_list ]
         return requires
 
+class ElfUtil(object):
+    @staticmethod
+    def get_so_list(elf):
+        cmd = 'ldd ' + elf
+        output = subprocess.check_output(cmd, shell=True)
+        ret = [ so.strip() for so in output.splitlines() ]
+        return ret
+
 class Menu(object):
     def __init__(self, items, stdscr):
         self._win = stdscr.subwin(0,0)
@@ -118,7 +126,9 @@ class ViewManager(object):
         menu.display()
 
 if __name__ == '__main__':
-    view = ViewManager()
-    view.show_menu()
+#    view = ViewManager()
 
-    del view
+    ret = ElfUtil.get_so_list('tests/hello')
+    print(ret)
+
+    #del view
